@@ -7,6 +7,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 public class CheckConnectionDatabaseController {
 
@@ -14,12 +17,16 @@ public class CheckConnectionDatabaseController {
     private JdbcTemplate jdbcTemplate;
 
     @GetMapping("check-connection")
-    public ResponseEntity<String> checkConnection() {
+    public ResponseEntity<Map<String, Object>> checkConnection() {
+        Map<String, Object> response = new HashMap<>();
         try{
-            jdbcTemplate.execute("select 1");
-            return new ResponseEntity<String>("success", HttpStatus.OK);
+            jdbcTemplate.execute("select * from users");
+            response.put("success", true);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<String>("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            response.put("success", false);
+            response.put("message", "Connection failed");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
